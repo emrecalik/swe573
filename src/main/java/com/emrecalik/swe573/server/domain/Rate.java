@@ -1,7 +1,6 @@
 package com.emrecalik.swe573.server.domain;
 
 import lombok.*;
-import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 

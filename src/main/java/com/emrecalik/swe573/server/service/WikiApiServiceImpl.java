@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public class WikiApiServiceImpl implements WikiApiService {
 
-    private WikidataApi wikidataApi;
+    private final WikidataApi wikidataApi;
 
     public WikiApiServiceImpl(WikidataApi wikidataApi) {
         this.wikidataApi = wikidataApi;

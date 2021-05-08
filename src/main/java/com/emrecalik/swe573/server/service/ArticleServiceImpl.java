@@ -1,14 +1,14 @@
 package com.emrecalik.swe573.server.service;
 
-import com.emrecalik.swe573.server.model.response.ApiResponseDto;
-import com.emrecalik.swe573.server.model.request.ArticlePostRequestDto;
-import com.emrecalik.swe573.server.model.response.ArticleResponseDto;
-import com.emrecalik.swe573.server.model.response.EntrezApiResponseDto;
-import com.emrecalik.swe573.server.model.response.WikiApiResponseDto;
 import com.emrecalik.swe573.server.domain.Article;
 import com.emrecalik.swe573.server.domain.User;
 import com.emrecalik.swe573.server.domain.WikiItem;
 import com.emrecalik.swe573.server.exception.ResourceNotFoundException;
+import com.emrecalik.swe573.server.model.request.ArticlePostRequestDto;
+import com.emrecalik.swe573.server.model.response.ApiResponseDto;
+import com.emrecalik.swe573.server.model.response.ArticleResponseDto;
+import com.emrecalik.swe573.server.model.response.EntrezApiResponseDto;
+import com.emrecalik.swe573.server.model.response.WikiApiResponseDto;
 import com.emrecalik.swe573.server.repository.ArticleRepository;
 import com.emrecalik.swe573.server.service.mapper.ArticleMapper;
 import com.emrecalik.swe573.server.service.mapper.WikiItemMapper;
@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,15 +37,22 @@ public class ArticleServiceImpl implements ArticleService {
 
     private static final String ARTICLE_TAG_SUCCESSFULLY_DELETED = "Article Tag is successfully deleted.";
 
-    private static final String ARTICLE_COULD_NOT_BE_FOUND= "Article could not be found!";
+    private static final String ARTICLE_COULD_NOT_BE_FOUND = "Article could not be found!";
 
-    private ArticleRepository articleRepository;
+    private static final String WIKI_ITEM_COULD_NOT_FOUND = "Wiki Item could not be found!";
 
-    private UserService userService;
+    private final ArticleRepository articleRepository;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, UserService userService) {
+    private final UserService userService;
+
+    private final WikiItemService wikiItemService;
+
+    public ArticleServiceImpl(ArticleRepository articleRepository,
+                              UserService userService,
+                              WikiItemService wikiItemService) {
         this.articleRepository = articleRepository;
         this.userService = userService;
+        this.wikiItemService = wikiItemService;
     }
 
     @Override
@@ -52,7 +60,12 @@ public class ArticleServiceImpl implements ArticleService {
 
         Set<WikiItem> wikiItemSet = new HashSet<>();
         for (WikiApiResponseDto wikiApiResponseDto : articlePostRequestDto.getWikiItems()) {
-            wikiItemSet.add(WikiItemMapper.convertWikiItemApiDtoToWikiItem(wikiApiResponseDto));
+            String entityId = wikiApiResponseDto.getEntityId();
+            if (wikiItemService.existsByEntityId(entityId)) {
+                wikiItemSet.add(wikiItemService.getByEntityId(entityId));
+            } else {
+                wikiItemSet.add(WikiItemMapper.convertWikiItemApiDtoToWikiItem(wikiApiResponseDto));
+            }
         }
 
         Set<Article> articleSet = new HashSet<>();
@@ -60,18 +73,37 @@ public class ArticleServiceImpl implements ArticleService {
             articleSet.add(ArticleMapper.convertArticleApiDtoToArticle(entrezApiResponseDto));
         }
 
-        User userProxy = userService.getUserProxy(articlePostRequestDto.getUserId());
+        Long userId = articlePostRequestDto.getUserId();
         for (Article article : articleSet) {
-            article.setWikiItems(wikiItemSet);
-            article.setUser(userProxy);
+            Long entityId = article.getEntityId();
+            if (existsByEntityIdAndUserId(entityId, userId)) {
+                Article articleInDb = getArticleByEntityIdAndUserId(entityId, userId);
+                articleInDb.getWikiItems().addAll(wikiItemSet);
+                articleRepository.save(articleInDb);
+            } else {
+                article.setWikiItems(wikiItemSet);
+                User userProxy = userService.getUserProxy(userId);
+                article.setUser(userProxy);
+                articleRepository.save(article);
+            }
         }
 
-        articleRepository.saveAll(articleSet);
-        log.info("Articles have been saved.");
+        log.info("Article(s) have been saved.");
         return ApiResponseDto.builder()
                 .header(ArticleServiceImpl.SUCCESS)
                 .message(ArticleServiceImpl.ARTICLE_SUCCESSFULLY_TAGGED)
                 .build();
+    }
+
+    @Override
+    public boolean existsByEntityIdAndUserId(Long entityId, Long userId) {
+        return articleRepository.existsByEntityIdAndUserId(entityId, userId);
+    }
+
+    @Override
+    public Article getArticleByEntityIdAndUserId(Long entityId, Long userId) {
+        return articleRepository.findByEntityIdAndUserId(entityId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException(ArticleServiceImpl.ARTICLE_COULD_NOT_BE_FOUND));
     }
 
     @Override
@@ -82,12 +114,23 @@ public class ArticleServiceImpl implements ArticleService {
         return createPaginatedResponse(articlePage, userId);
     }
 
+    @Transactional
     @Override
     public ApiResponseDto deleteArticleById(Long id) {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ArticleServiceImpl.ARTICLE_COULD_NOT_BE_FOUND));
+
+        Set<WikiItem> articleWikiItems = article.getWikiItems();
+
+        for (WikiItem wikiItem : articleWikiItems) {
+            if (wikiItemService.getById(wikiItem.getId()).getArticleSet().size() == 1) {
+                wikiItemService.deleteWikiItem(wikiItem);
+            }
+        }
+
         articleRepository.delete(article);
         log.info("Article has been deleted.");
+
         return new ApiResponseDto(ArticleServiceImpl.SUCCESS, ArticleServiceImpl.ARTICLE_SUCCESSFULLY_DELETED);
     }
 
@@ -127,8 +170,18 @@ public class ArticleServiceImpl implements ArticleService {
     public ApiResponseDto deleteArticleTag(Long articleId, String wikiItemEntityId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new ResourceNotFoundException(ArticleServiceImpl.ARTICLE_COULD_NOT_BE_FOUND));
-        article.getWikiItems().removeIf(wikiItem -> wikiItem.getEntityId().equals(wikiItemEntityId));
+
+        WikiItem articleWikiItem = article.getWikiItems().stream()
+                .filter(wikiItem -> wikiItem.getEntityId().equals(wikiItemEntityId))
+                .findFirst().orElseThrow(() -> new ResourceNotFoundException(ArticleServiceImpl.WIKI_ITEM_COULD_NOT_FOUND));
+
+        article.getWikiItems().remove(articleWikiItem);
         articleRepository.save(article);
+
+        if (articleWikiItem.getArticleSet().isEmpty()) {
+            wikiItemService.deleteWikiItem(articleWikiItem);
+        }
+
         log.info("Article Tag: " + wikiItemEntityId + "  has been deleted.");
 
         return new ApiResponseDto(ArticleServiceImpl.SUCCESS, ArticleServiceImpl.ARTICLE_TAG_SUCCESSFULLY_DELETED);

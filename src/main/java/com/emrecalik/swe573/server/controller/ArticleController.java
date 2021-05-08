@@ -1,6 +1,7 @@
 package com.emrecalik.swe573.server.controller;
 
 import com.emrecalik.swe573.server.model.request.ArticlePostRequestDto;
+import com.emrecalik.swe573.server.model.response.ApiResponseDto;
 import com.emrecalik.swe573.server.service.ArticleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +14,15 @@ public class ArticleController {
 
     public static final String BASE_URL = "/api/article";
 
-    private ArticleService articleService;
+    private final ArticleService articleService;
 
     public ArticleController(ArticleService articleService) {
         this.articleService = articleService;
     }
 
     @PostMapping("")
-    public ResponseEntity<?> saveArticle(@RequestBody ArticlePostRequestDto
-                                                     articlePostRequestDto) {
+    public ResponseEntity<ApiResponseDto> saveArticle(@RequestBody ArticlePostRequestDto
+                                                              articlePostRequestDto) {
         return ResponseEntity.ok(articleService.saveArticle(articlePostRequestDto));
     }
 

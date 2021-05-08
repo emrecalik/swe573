@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ArticleRepository extends JpaRepository<Article, Long> {
 
@@ -15,4 +17,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     Page<Article> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
 
     Page<Article> findAll(Pageable pageable);
+
+    boolean existsByEntityIdAndUserId(Long entityId, Long userId);
+
+    Optional<Article> findByEntityIdAndUserId(Long entityId, Long userId);
 }

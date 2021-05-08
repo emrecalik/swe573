@@ -12,7 +12,7 @@ public class EntrezApiController {
 
     public static final String BASE_URL = "/api/entrez/article";
 
-    private EntrezApiService entrezApiService;
+    private final EntrezApiService entrezApiService;
 
     public EntrezApiController(EntrezApiService entrezApiService) {
         this.entrezApiService = entrezApiService;

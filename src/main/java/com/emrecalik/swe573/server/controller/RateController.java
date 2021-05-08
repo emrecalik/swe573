@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 public class RateController {
     public static final String BASE_URL = "/api/article";
 
-    private RateService rateService;
+    private final RateService rateService;
 
     public RateController(RateService rateService) {
         this.rateService = rateService;

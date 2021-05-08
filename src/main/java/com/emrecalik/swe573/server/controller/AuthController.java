@@ -12,12 +12,16 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     public static final String BASE_URL = "/api/auth";
-    protected static final String SIGN_UP_URL = "/signup";
-    protected static final String SIGN_IN_URL = "/signin";
-    protected static final String TOKEN_REFRESH_URL = "/token/refresh";
-    protected static final String SIGN_OUT_URL = "/signout";
 
-    private AuthService authService;
+    public static final String SIGN_UP_URL = "/signup";
+
+    public static final String SIGN_IN_URL = "/signin";
+
+    public static final String TOKEN_REFRESH_URL = "/token/refresh";
+
+    public static final String SIGN_OUT_URL = "/signout";
+
+    private final AuthService authService;
 
     public AuthController(AuthService authService) {
         this.authService = authService;

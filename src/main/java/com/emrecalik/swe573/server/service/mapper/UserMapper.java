@@ -1,16 +1,19 @@
 package com.emrecalik.swe573.server.service.mapper;
 
-import com.emrecalik.swe573.server.model.response.ArticleResponseDto;
-import com.emrecalik.swe573.server.model.response.UserDetailsResponseDto;
-import com.emrecalik.swe573.server.model.request.SignUpRequestDto;
 import com.emrecalik.swe573.server.domain.Rate;
 import com.emrecalik.swe573.server.domain.User;
+import com.emrecalik.swe573.server.model.request.SignUpRequestDto;
+import com.emrecalik.swe573.server.model.response.ArticleResponseDto;
+import com.emrecalik.swe573.server.model.response.UserDetailsResponseDto;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class UserMapper {
+
+    private UserMapper() {
+    }
 
     public static User convertSignUpUserRequestToUser(SignUpRequestDto signUpRequestDto,
                                                       PasswordEncoder passwordEncoder) {

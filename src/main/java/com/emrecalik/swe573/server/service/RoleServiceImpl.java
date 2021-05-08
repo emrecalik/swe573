@@ -5,8 +5,9 @@ import com.emrecalik.swe573.server.repository.RoleRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RoleServiceImpl implements RoleService{
-    private RoleRepository roleRepository;
+public class RoleServiceImpl implements RoleService {
+
+    private final RoleRepository roleRepository;
 
     public RoleServiceImpl(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;

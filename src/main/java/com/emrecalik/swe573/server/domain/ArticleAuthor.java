@@ -14,10 +14,13 @@ import javax.persistence.Id;
 @AllArgsConstructor
 @Entity
 public class ArticleAuthor {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String foreName;
+
     private String lastName;
+
 }

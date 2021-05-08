@@ -1,11 +1,7 @@
 package com.emrecalik.swe573.server.service.mapper;
 
-import com.emrecalik.swe573.server.model.response.ArticleResponseDto;
-import com.emrecalik.swe573.server.model.response.ArticleTagResponseDto;
-import com.emrecalik.swe573.server.model.response.ArticleUserResponseDto;
-import com.emrecalik.swe573.server.model.response.EntrezApiResponseDto;
-import com.emrecalik.swe573.server.model.response.ArticleAuthorResponseDto;
 import com.emrecalik.swe573.server.domain.*;
+import com.emrecalik.swe573.server.model.response.*;
 import com.emrecalik.swe573.server.service.api.entrez.PubmedArticle;
 
 import java.util.HashSet;
@@ -14,6 +10,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ArticleMapper {
+
+    private ArticleMapper() {
+    }
 
     public static EntrezApiResponseDto convertPubmedArticleToPubmedArticleDto(PubmedArticle pubmedArticle) {
 

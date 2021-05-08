@@ -14,12 +14,17 @@ import java.util.Set;
 @Entity
 @Table(name = "wiki_item")
 public class WikiItem {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String entityId;
+
     private String conceptUri;
+
     private String label;
+
     private String description;
 
     @ElementCollection
@@ -28,4 +33,7 @@ public class WikiItem {
             joinColumns = @JoinColumn(name = "wiki_item_id"))
     @Column(name = "alias")
     private Set<String> aliases = new HashSet<>();
+
+    @ManyToMany(mappedBy = "wikiItems")
+    private Set<Article> articleSet = new HashSet<>();
 }

@@ -7,9 +7,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(WikiApiController.BASE_URL)
 public class WikiApiController {
+
     public static final String BASE_URL = "/api/wiki";
 
-    private WikiApiService wikiApiService;
+    private final WikiApiService wikiApiService;
 
     public WikiApiController(WikiApiService wikiApiService) {
         this.wikiApiService = wikiApiService;

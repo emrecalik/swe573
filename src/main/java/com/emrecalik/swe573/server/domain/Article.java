@@ -1,5 +1,6 @@
 package com.emrecalik.swe573.server.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,13 +13,19 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "article")
+@Table(name = "article", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {
+                "entity_id",
+                "user_id"
+        })
+})
 public class Article {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "entity_id")
     private Long entityId;
 
     private String title;
@@ -36,7 +43,8 @@ public class Article {
     @Column(name = "keyword")
     private Set<String> keywords = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JsonBackReference
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "article_wiki_item",
             joinColumns = @JoinColumn(name = "article_id"),
             inverseJoinColumns = @JoinColumn(name = "wiki_item_id"))
@@ -48,5 +56,5 @@ public class Article {
 
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "article_id")
-    private Set<Rate> rates;
+    private Set<Rate> rates = new HashSet<>();
 }

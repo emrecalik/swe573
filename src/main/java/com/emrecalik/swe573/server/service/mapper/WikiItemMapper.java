@@ -1,7 +1,7 @@
 package com.emrecalik.swe573.server.service.mapper;
 
-import com.emrecalik.swe573.server.model.response.WikiApiResponseDto;
 import com.emrecalik.swe573.server.domain.WikiItem;
+import com.emrecalik.swe573.server.model.response.WikiApiResponseDto;
 import org.wikidata.wdtk.datamodel.implementation.ItemDocumentImpl;
 import org.wikidata.wdtk.datamodel.interfaces.EntityDocument;
 import org.wikidata.wdtk.datamodel.interfaces.ItemDocument;
@@ -13,8 +13,11 @@ import java.util.stream.Collectors;
 
 public class WikiItemMapper {
 
+    private WikiItemMapper() {
+    }
+
     public static WikiApiResponseDto convertWbSearchEntitiesResultToWikiItemDto(WbSearchEntitiesResult
-                                                                                entitiesResult) {
+                                                                                        entitiesResult) {
         return WikiApiResponseDto.builder()
                 .entityId(entitiesResult.getEntityId())
                 .conceptUri(entitiesResult.getConceptUri())

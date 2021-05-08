@@ -14,7 +14,7 @@ import java.util.Set;
 @Service
 public class EntrezApiServiceImpl implements EntrezApiService {
 
-    private EntrezApi entrezApi;
+    private final EntrezApi entrezApi;
 
     public EntrezApiServiceImpl(EntrezApi entrezApi) {
         this.entrezApi = entrezApi;

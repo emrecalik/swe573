@@ -1,24 +1,21 @@
 package com.emrecalik.swe573.server.service;
 
-import com.emrecalik.swe573.server.model.response.ApiResponseDto;
-import com.emrecalik.swe573.server.model.response.RefreshedAccessTokenResponseDto;
-import com.emrecalik.swe573.server.model.request.RefreshTokenRequestDto;
-import com.emrecalik.swe573.server.model.request.SignInRequestDto;
-import com.emrecalik.swe573.server.model.response.SignInResponseDto;
-import com.emrecalik.swe573.server.model.request.SignUpRequestDto;
 import com.emrecalik.swe573.server.domain.RefreshToken;
 import com.emrecalik.swe573.server.domain.Role;
 import com.emrecalik.swe573.server.domain.User;
 import com.emrecalik.swe573.server.exception.BadRequestException;
 import com.emrecalik.swe573.server.exception.ResourceNotFoundException;
+import com.emrecalik.swe573.server.model.request.RefreshTokenRequestDto;
+import com.emrecalik.swe573.server.model.request.SignInRequestDto;
+import com.emrecalik.swe573.server.model.request.SignUpRequestDto;
+import com.emrecalik.swe573.server.model.response.ApiResponseDto;
+import com.emrecalik.swe573.server.model.response.RefreshedAccessTokenResponseDto;
+import com.emrecalik.swe573.server.model.response.SignInResponseDto;
 import com.emrecalik.swe573.server.repository.RefreshTokenRepository;
 import com.emrecalik.swe573.server.security.JwtUtility;
 import com.emrecalik.swe573.server.service.mapper.UserMapper;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,24 +23,21 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.util.Date;
-
 @Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private UserService userService;
+    private final UserService userService;
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    private JwtUtility jwtUtility;
+    private final JwtUtility jwtUtility;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    private RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    private RoleService roleService;
+    private final RoleService roleService;
 
     public AuthServiceImpl(UserService userService, AuthenticationManager authenticationManager,
                            JwtUtility jwtUtility, PasswordEncoder passwordEncoder,
