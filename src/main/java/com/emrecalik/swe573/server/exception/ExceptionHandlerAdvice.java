@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -13,8 +14,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
 
-    @ExceptionHandler(value = { AuthenticationException.class })
-    public ResponseEntity<?> handleAuthenticationException(AuthenticationException ex) {
+    @ExceptionHandler(value = {AuthenticationException.class})
+    public ResponseEntity<ApiResponseDto> handleAuthenticationException(AuthenticationException ex) {
         log.error("Authentication Exception: " + ex.getMessage());
         ApiResponseDto apiResponseDto = ApiResponseDto.builder()
                 .header("Bad Credential")
@@ -23,17 +24,18 @@ public class ExceptionHandlerAdvice {
         return ResponseEntity.badRequest().body(apiResponseDto);
     }
 
-    @ExceptionHandler(value = { ExpiredJwtException.class })
-    public ResponseEntity<?> handleExpiredJwtException(ExpiredJwtException ex) {
+    @ExceptionHandler(value = {ExpiredJwtException.class})
+    public ResponseEntity<ApiResponseDto> handleExpiredJwtException(ExpiredJwtException ex) {
         log.error("Expired JWT Exception: " + ex.getMessage());
         ApiResponseDto apiResponseDto = ApiResponseDto.builder()
                 .header("Expired JWT")
                 .message(ex.getMessage())
                 .build();
-        return ResponseEntity.badRequest().body(apiResponseDto);    }
+        return ResponseEntity.badRequest().body(apiResponseDto);
+    }
 
-    @ExceptionHandler(value = { BadRequestException.class })
-    public ResponseEntity<?> handleBadRequestException(BadRequestException ex) {
+    @ExceptionHandler(value = {BadRequestException.class})
+    public ResponseEntity<ApiResponseDto> handleBadRequestException(BadRequestException ex) {
         log.error("Bad Request Exception: " + ex.getMessage());
         ApiResponseDto apiResponseDto = ApiResponseDto.builder()
                 .header("Bad Request")
@@ -42,8 +44,8 @@ public class ExceptionHandlerAdvice {
         return ResponseEntity.badRequest().body(apiResponseDto);
     }
 
-    @ExceptionHandler(value = { ResourceNotFoundException.class })
-    public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException ex) {
+    @ExceptionHandler(value = {ResourceNotFoundException.class})
+    public ResponseEntity<ApiResponseDto> handleResourceNotFoundException(ResourceNotFoundException ex) {
         log.error("Resource Not Found Exception: " + ex.getMessage());
         ApiResponseDto apiResponseDto = ApiResponseDto.builder()
                 .header("Resource Not Found")
@@ -52,8 +54,8 @@ public class ExceptionHandlerAdvice {
         return ResponseEntity.badRequest().body(apiResponseDto);
     }
 
-    @ExceptionHandler(value = { ExternalApiException.class })
-    public ResponseEntity<?> handleExternalApiException(ExternalApiException ex) {
+    @ExceptionHandler(value = {ExternalApiException.class})
+    public ResponseEntity<ApiResponseDto> handleExternalApiException(ExternalApiException ex) {
         log.error("External Api Exception: " + ex.getMessage());
         ApiResponseDto apiResponseDto = ApiResponseDto.builder()
                 .header("Api Error")
@@ -62,8 +64,18 @@ public class ExceptionHandlerAdvice {
         return ResponseEntity.badRequest().body(apiResponseDto);
     }
 
-    @ExceptionHandler(value = { Exception.class })
-    public ResponseEntity<?> handleException(Exception ex) {
+    @ExceptionHandler(value = {MethodArgumentNotValidException.class})
+    public ResponseEntity<ApiResponseDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        log.error("Method Argument Not Valid Exception: " + ex.getMessage());
+        ApiResponseDto apiResponseDto = ApiResponseDto.builder()
+                .header("Bad Request")
+                .message(ex.getAllErrors().get(0).getDefaultMessage())
+                .build();
+        return ResponseEntity.badRequest().body(apiResponseDto);
+    }
+
+    @ExceptionHandler(value = {Exception.class})
+    public ResponseEntity<ApiResponseDto> handleException(Exception ex) {
         log.error("Exception: " + ex.getMessage());
         ApiResponseDto apiResponseDto = ApiResponseDto.builder()
                 .header("Error")

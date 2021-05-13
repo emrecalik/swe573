@@ -1,9 +1,14 @@
 package com.emrecalik.swe573.server.controller;
 
+import com.emrecalik.swe573.server.model.response.ApiResponseDto;
 import com.emrecalik.swe573.server.service.RateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -17,10 +22,10 @@ public class RateController {
         this.rateService = rateService;
     }
 
-    @PostMapping(value = "/{id}/rate", params = { "userId", "rateValue" })
-    public ResponseEntity<?> rateArticle(@PathVariable Long id,
-                                         @RequestParam Long userId,
-                                         @RequestParam int rateValue) {
+    @PostMapping(value = "/{id}/rate", params = {"userId", "rateValue"})
+    public ResponseEntity<ApiResponseDto> rateArticle(@PathVariable Long id,
+                                                      @RequestParam Long userId,
+                                                      @RequestParam int rateValue) {
         return ResponseEntity.ok(rateService.saveOrUpdateRate(id, userId, rateValue));
     }
 }

@@ -82,7 +82,7 @@ public class ArticleServiceImpl implements ArticleService {
                 articleRepository.save(articleInDb);
             } else {
                 article.setWikiItems(wikiItemSet);
-                User userProxy = userService.getUserProxy(userId);
+                User userProxy = userService.getUserProxyById(userId);
                 article.setUser(userProxy);
                 articleRepository.save(article);
             }
@@ -131,7 +131,10 @@ public class ArticleServiceImpl implements ArticleService {
         articleRepository.delete(article);
         log.info("Article has been deleted.");
 
-        return new ApiResponseDto(ArticleServiceImpl.SUCCESS, ArticleServiceImpl.ARTICLE_SUCCESSFULLY_DELETED);
+        return ApiResponseDto.builder()
+                .header(ArticleServiceImpl.SUCCESS)
+                .message(ArticleServiceImpl.ARTICLE_SUCCESSFULLY_DELETED)
+                .build();
     }
 
     @Override

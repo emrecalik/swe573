@@ -36,7 +36,7 @@ public class RateServiceImpl implements RateService {
             rateToUpdate.setRateValue(rateValue);
             rateRepository.save(rateToUpdate);
         } else {
-            User userProxy = userService.getUserProxy(userId);
+            User userProxy = userService.getUserProxyById(userId);
             Article articleProxy = articleService.getArticleProxy(articleId);
             Rate rateToSave = Rate.builder()
                     .user(userProxy)

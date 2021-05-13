@@ -1,6 +1,7 @@
 package com.emrecalik.swe573.server.service;
 
 import com.emrecalik.swe573.server.domain.User;
+import com.emrecalik.swe573.server.exception.BadRequestException;
 import com.emrecalik.swe573.server.exception.ResourceNotFoundException;
 import com.emrecalik.swe573.server.model.response.UserDetailsResponseDto;
 import com.emrecalik.swe573.server.repository.UserRepository;
@@ -9,6 +10,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final String NOT_FOUND_USER_FOR_USERNAME = "Not found user for username =  ";
+
+    private static final String NOT_FOUND_USER_FOR_ID = "Not found user for id = ";
+
+    private static final String USER_CAN_NOT_FOLLOW_HIM_OR_HER_SELF = "User can not follow him/herself.";
+
+    private static final String USER_CAN_NOT_UNFOLLOW_HIM_OR_HER_SELF = "User can not unfollow him/herself.";
 
     private final UserRepository userRepository;
 
@@ -19,7 +28,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByUserName(String userName) {
         return userRepository.findByUserName(userName)
-                .orElseThrow(() -> new ResourceNotFoundException("Not Found User For UserName = " + userName));
+                .orElseThrow(() -> new ResourceNotFoundException(UserServiceImpl.NOT_FOUND_USER_FOR_USERNAME + userName));
     }
 
     @Override
@@ -38,16 +47,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserProxy(Long id) {
+    public User getUserProxyById(Long id) {
         return userRepository.getOne(id);
     }
 
     @Override
-    public UserDetailsResponseDto getUserDetails(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Not Found User for Id = " + id));
-        return UserMapper.convertUserToUserDetailsResponseDto(user);
+    public UserDetailsResponseDto getUserDetails(Long userId, Long requesterId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(UserServiceImpl.NOT_FOUND_USER_FOR_ID + userId));
+
+        boolean isFollowedByRequester = user.getFollowers().stream()
+                .anyMatch(followee -> followee.getId().equals(requesterId));
+
+        return UserMapper.convertUserToUserDetailsResponseDto(user, isFollowedByRequester);
     }
 
+    @Override
+    public UserDetailsResponseDto followUser(Long userId, Long followeeId) {
+        if (userId.equals(followeeId)) {
+            throw new BadRequestException(UserServiceImpl.USER_CAN_NOT_FOLLOW_HIM_OR_HER_SELF);
+        }
+        User user = getUserProxyById(userId);
+        User followee = getUserProxyById(followeeId);
+        user.getFollowees().add(followee);
+        userRepository.save(user);
+        return getUserDetails(followeeId, userId);
+    }
 
+    @Override
+    public UserDetailsResponseDto unFollowUser(Long userId, Long followeeId) {
+        if (userId.equals(followeeId)) {
+            throw new BadRequestException(UserServiceImpl.USER_CAN_NOT_UNFOLLOW_HIM_OR_HER_SELF);
+        }
+        User user = getUserProxyById(userId);
+        User followee = getUserProxyById(followeeId);
+        user.getFollowees().remove(followee);
+        userRepository.save(user);
+        return getUserDetails(followeeId, userId);
+    }
 }
