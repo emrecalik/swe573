@@ -14,6 +14,8 @@ public interface UserService {
 
     User getUserProxyById(Long id);
 
+    User getUserById(Long id);
+
     UserDetailsResponseDto getUserDetails(Long userId, Long requesterId);
 
     UserDetailsResponseDto followUser(Long userId, Long followeeId);

@@ -1,6 +1,10 @@
 package com.emrecalik.swe573.server.config;
 
-import com.emrecalik.swe573.server.controller.*;
+import com.emrecalik.swe573.server.controller.ActivityController;
+import com.emrecalik.swe573.server.controller.AuthController;
+import com.emrecalik.swe573.server.controller.EntrezApiController;
+import com.emrecalik.swe573.server.controller.UserController;
+import com.emrecalik.swe573.server.controller.WikiApiController;
 import com.emrecalik.swe573.server.security.CustomUserDetailsService;
 import com.emrecalik.swe573.server.security.JwtAuthFilter;
 import com.emrecalik.swe573.server.security.JwtAuthenticationEntryPoint;
@@ -40,15 +44,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .exceptionHandling()
-                    .authenticationEntryPoint(authenticationEntryPoint)
+                .authenticationEntryPoint(authenticationEntryPoint)
                 .and().sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeRequests()
-                    .antMatchers(AuthController.BASE_URL + "/**").permitAll()
-                    .antMatchers(EntrezApiController.BASE_URL + "/**").permitAll()
-                    .antMatchers(WikiApiController.BASE_URL + "/**").permitAll()
+                .antMatchers(AuthController.BASE_URL + "/**").permitAll()
+                .antMatchers(EntrezApiController.BASE_URL + "/**").permitAll()
+                .antMatchers(WikiApiController.BASE_URL + "/**").permitAll()
 //                    .antMatchers(ArticleController.BASE_URL + "/**").permitAll()
-                    .antMatchers(UserController.BASE_URL + "/**").permitAll()
+                .antMatchers(UserController.BASE_URL + "/**").permitAll()
+                .antMatchers(ActivityController.BASE_URL + "/**").permitAll()
                 .anyRequest().authenticated()
                 .and().formLogin()
                 .and().httpBasic();

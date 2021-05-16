@@ -1,5 +1,6 @@
 package com.emrecalik.swe573.server.service;
 
+import com.emrecalik.swe573.server.domain.Activity;
 import com.emrecalik.swe573.server.domain.Article;
 import com.emrecalik.swe573.server.domain.Rate;
 import com.emrecalik.swe573.server.domain.User;
@@ -20,12 +21,14 @@ public class RateServiceImpl implements RateService {
 
     private final ArticleService articleService;
 
-    public RateServiceImpl(RateRepository rateRepository,
-                           UserService userService,
-                           ArticleService articleService) {
+    private final ActivityService activityService;
+
+    public RateServiceImpl(RateRepository rateRepository, UserService userService,
+                           ArticleService articleService, ActivityService activityService) {
         this.rateRepository = rateRepository;
         this.userService = userService;
         this.articleService = articleService;
+        this.activityService = activityService;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class RateServiceImpl implements RateService {
             rateRepository.save(rateToUpdate);
         } else {
             User userProxy = userService.getUserProxyById(userId);
-            Article articleProxy = articleService.getArticleProxy(articleId);
+            Article articleProxy = articleService.getArticleProxyById(articleId);
             Rate rateToSave = Rate.builder()
                     .user(userProxy)
                     .article(articleProxy)
@@ -45,6 +48,16 @@ public class RateServiceImpl implements RateService {
                     .build();
             rateRepository.save(rateToSave);
         }
+
+        Activity activity = Activity.builder()
+                .summary(" rated ")
+                .activityType(Activity.ActivityType.RATE)
+                .objectType(Activity.ObjectType.ARTICLE)
+                .actorId(userId)
+                .objectId(articleId)
+                .build();
+        activityService.saveActivity(activity);
+
         return ApiResponseDto.builder()
                 .header(RateServiceImpl.SUCCESS)
                 .message(RateServiceImpl.VOTE_IS_SUCCESSFULLY_SAVED)

@@ -1,5 +1,6 @@
 package com.emrecalik.swe573.server.service;
 
+import com.emrecalik.swe573.server.domain.Activity;
 import com.emrecalik.swe573.server.domain.User;
 import com.emrecalik.swe573.server.exception.BadRequestException;
 import com.emrecalik.swe573.server.exception.ResourceNotFoundException;
@@ -21,8 +22,11 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    private final ActivityService activityService;
+
+    public UserServiceImpl(UserRepository userRepository, ActivityService activityService) {
         this.userRepository = userRepository;
+        this.activityService = activityService;
     }
 
     @Override
@@ -52,6 +56,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(UserServiceImpl.NOT_FOUND_USER_FOR_ID + id));
+    }
+
+    @Override
     public UserDetailsResponseDto getUserDetails(Long userId, Long requesterId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(UserServiceImpl.NOT_FOUND_USER_FOR_ID + userId));
@@ -71,6 +81,16 @@ public class UserServiceImpl implements UserService {
         User followee = getUserProxyById(followeeId);
         user.getFollowees().add(followee);
         userRepository.save(user);
+
+        Activity activity = Activity.builder()
+                .summary(" followed ")
+                .activityType(Activity.ActivityType.FOLLOW)
+                .objectType(Activity.ObjectType.USER)
+                .actorId(userId)
+                .objectId(followeeId)
+                .build();
+        activityService.saveActivity(activity);
+
         return getUserDetails(followeeId, userId);
     }
 
@@ -83,6 +103,16 @@ public class UserServiceImpl implements UserService {
         User followee = getUserProxyById(followeeId);
         user.getFollowees().remove(followee);
         userRepository.save(user);
+
+        Activity activity = Activity.builder()
+                .summary(" unfollowed ")
+                .activityType(Activity.ActivityType.UNFOLLOW)
+                .objectType(Activity.ObjectType.USER)
+                .actorId(userId)
+                .objectId(followeeId)
+                .build();
+        activityService.saveActivity(activity);
+
         return getUserDetails(followeeId, userId);
     }
 }

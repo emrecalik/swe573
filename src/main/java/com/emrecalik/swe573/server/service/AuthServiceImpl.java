@@ -1,5 +1,6 @@
 package com.emrecalik.swe573.server.service;
 
+import com.emrecalik.swe573.server.domain.Activity;
 import com.emrecalik.swe573.server.domain.RefreshToken;
 import com.emrecalik.swe573.server.domain.Role;
 import com.emrecalik.swe573.server.domain.User;
@@ -39,15 +40,19 @@ public class AuthServiceImpl implements AuthService {
 
     private final RoleService roleService;
 
+    private final ActivityService activityService;
+
     public AuthServiceImpl(UserService userService, AuthenticationManager authenticationManager,
                            JwtUtility jwtUtility, PasswordEncoder passwordEncoder,
-                           RefreshTokenRepository refreshTokenRepository, RoleService roleService) {
+                           RefreshTokenRepository refreshTokenRepository, RoleService roleService,
+                           ActivityService activityService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtUtility = jwtUtility;
         this.passwordEncoder = passwordEncoder;
         this.refreshTokenRepository = refreshTokenRepository;
         this.roleService = roleService;
+        this.activityService = activityService;
     }
 
     @Override
@@ -57,10 +62,19 @@ public class AuthServiceImpl implements AuthService {
         Authentication authentication = authenticationManager.authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String accessToken = jwtUtility.generateToken(authentication);
-        User user = userService.findByUserName(signInRequestDto.getUserName());
+        String userName = signInRequestDto.getUserName();
+        User user = userService.findByUserName(userName);
         String userRole = user.getRole().getRoleName().name();
         userRole = userRole.substring(userRole.indexOf("_") + 1);
         String refreshToken = createRefreshToken(user);
+
+        Activity activity = Activity.builder()
+                .summary(" signed in.")
+                .activityType(Activity.ActivityType.SIGNIN)
+                .actorId(user.getId())
+                .build();
+        activityService.saveActivity(activity);
+
         return SignInResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

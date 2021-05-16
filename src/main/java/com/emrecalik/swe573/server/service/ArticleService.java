@@ -18,7 +18,9 @@ public interface ArticleService {
 
     Map<String, Object> getPaginatedArticles(int pageNum, Long userId);
 
-    Article getArticleProxy(Long articleId);
+    Article getArticleProxyById(Long articleId);
+
+    Article getArticleById(Long articleId);
 
     ApiResponseDto deleteArticleTag(Long articleId, String wikiItemEntityId);
 

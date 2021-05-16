@@ -1,5 +1,6 @@
 package com.emrecalik.swe573.server.service;
 
+import com.emrecalik.swe573.server.domain.Activity;
 import com.emrecalik.swe573.server.domain.Article;
 import com.emrecalik.swe573.server.domain.User;
 import com.emrecalik.swe573.server.domain.WikiItem;
@@ -47,12 +48,16 @@ public class ArticleServiceImpl implements ArticleService {
 
     private final WikiItemService wikiItemService;
 
+    private final ActivityService activityService;
+
     public ArticleServiceImpl(ArticleRepository articleRepository,
                               UserService userService,
-                              WikiItemService wikiItemService) {
+                              WikiItemService wikiItemService,
+                              ActivityService activityService) {
         this.articleRepository = articleRepository;
         this.userService = userService;
         this.wikiItemService = wikiItemService;
+        this.activityService = activityService;
     }
 
     @Override
@@ -76,19 +81,29 @@ public class ArticleServiceImpl implements ArticleService {
         Long userId = articlePostRequestDto.getUserId();
         for (Article article : articleSet) {
             Long entityId = article.getEntityId();
+            Article articleSaved;
             if (existsByEntityIdAndUserId(entityId, userId)) {
                 Article articleInDb = getArticleByEntityIdAndUserId(entityId, userId);
                 articleInDb.getWikiItems().addAll(wikiItemSet);
-                articleRepository.save(articleInDb);
+                articleSaved = articleRepository.save(articleInDb);
             } else {
                 article.setWikiItems(wikiItemSet);
                 User userProxy = userService.getUserProxyById(userId);
                 article.setUser(userProxy);
-                articleRepository.save(article);
+                articleSaved = articleRepository.save(article);
             }
-        }
 
+            Activity activity = Activity.builder()
+                    .summary(" tagged ")
+                    .activityType(Activity.ActivityType.TAG)
+                    .objectType(Activity.ObjectType.ARTICLE)
+                    .actorId(userId)
+                    .objectId(articleSaved.getId())
+                    .build();
+            activityService.saveActivity(activity);
+        }
         log.info("Article(s) have been saved.");
+
         return ApiResponseDto.builder()
                 .header(ArticleServiceImpl.SUCCESS)
                 .message(ArticleServiceImpl.ARTICLE_SUCCESSFULLY_TAGGED)
@@ -131,6 +146,8 @@ public class ArticleServiceImpl implements ArticleService {
         articleRepository.delete(article);
         log.info("Article has been deleted.");
 
+        activityService.deleteActivityByObjectId(id);
+
         return ApiResponseDto.builder()
                 .header(ArticleServiceImpl.SUCCESS)
                 .message(ArticleServiceImpl.ARTICLE_SUCCESSFULLY_DELETED)
@@ -165,8 +182,14 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article getArticleProxy(Long articleId) {
+    public Article getArticleProxyById(Long articleId) {
         return articleRepository.getOne(articleId);
+    }
+
+    @Override
+    public Article getArticleById(Long articleId) {
+        return articleRepository.findById(articleId)
+                .orElseThrow(() -> new ResourceNotFoundException(ARTICLE_COULD_NOT_BE_FOUND));
     }
 
     @Override
@@ -186,6 +209,15 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         log.info("Article Tag: " + wikiItemEntityId + "  has been deleted.");
+
+        Activity activity = Activity.builder()
+                .summary(" updated ")
+                .activityType(Activity.ActivityType.UPDATE)
+                .objectType(Activity.ObjectType.ARTICLE)
+                .actorId(article.getUser().getId())
+                .objectId(articleId)
+                .build();
+        activityService.saveActivity(activity);
 
         return new ApiResponseDto(ArticleServiceImpl.SUCCESS, ArticleServiceImpl.ARTICLE_TAG_SUCCESSFULLY_DELETED);
     }
