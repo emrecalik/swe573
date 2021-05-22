@@ -3,17 +3,18 @@ version: '3.7'
 services:
 
   wikimed-backend:
-    image: emrecalik/wikimed-server
+    image: emrecalik/wikimed-server:0.0.1-SNAPSHOT
     restart: always
     networks:
       - wikimed-network
     ports:
       - 8080:8080
+    mem_limit: 700M
     depends_on:
       - wikimed-mysql
 
   wikimed-mysql:
-    image: emrecalik/wikimed-db
+    image: emrecalik/wikimed-db:0.0.1-SNAPSHOT
     networks:
       - wikimed-network
     ports:
@@ -21,6 +22,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=emre1905
       - MYSQL_DATABASE=wikimed_db
+    mem_limit: 700M
 
 networks:
   wikimed-network:
