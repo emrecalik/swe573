@@ -8,11 +8,11 @@
         <version>2.4.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.emrecalik.swe573</groupId>
-    <artifactId>swe573-server</artifactId>
+    <groupId>com.emrecalik.wikimed</groupId>
+    <artifactId>wikimed-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>swe573-server</name>
-    <description>SWE 573 PROJECT SERVER</description>
+    <name>wikimed-server</name>
+    <description>SWE 573 WIKIMED PROJECT SERVER</description>
     <properties>
         <java.version>11</java.version>
     </properties>
@@ -105,6 +105,10 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <image>
+                        <name>emrecalik/${project.artifactId}:${project.version}</name>
+                    </image>
+                    <pullPolicy>IF_NOT_PRESENT</pullPolicy>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
