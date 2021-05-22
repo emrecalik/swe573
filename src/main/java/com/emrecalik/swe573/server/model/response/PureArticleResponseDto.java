@@ -11,10 +11,11 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class EntrezApiResponseDto {
+public class PureArticleResponseDto {
+    private Long id;
     private Long entityId;
     private String title;
     private String articleAbstract;
-    private List<ArticleAuthorResponseDto> authors;
+    private List<PureArticleAuthorResponseDto> authors;
     private List<String> keywords;
 }

@@ -1,10 +1,12 @@
 package com.emrecalik.swe573.server.config;
 
 import com.emrecalik.swe573.server.controller.ActivityController;
+import com.emrecalik.swe573.server.controller.ArticleController;
 import com.emrecalik.swe573.server.controller.AuthController;
-import com.emrecalik.swe573.server.controller.EntrezApiController;
+import com.emrecalik.swe573.server.controller.PureArticleController;
 import com.emrecalik.swe573.server.controller.UserController;
 import com.emrecalik.swe573.server.controller.WikiApiController;
+import com.emrecalik.swe573.server.controller.entrez.EntrezApiController;
 import com.emrecalik.swe573.server.security.CustomUserDetailsService;
 import com.emrecalik.swe573.server.security.JwtAuthFilter;
 import com.emrecalik.swe573.server.security.JwtAuthenticationEntryPoint;
@@ -51,9 +53,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(AuthController.BASE_URL + "/**").permitAll()
                 .antMatchers(EntrezApiController.BASE_URL + "/**").permitAll()
                 .antMatchers(WikiApiController.BASE_URL + "/**").permitAll()
-//                    .antMatchers(ArticleController.BASE_URL + "/**").permitAll()
+                .antMatchers(ArticleController.BASE_URL + "/**").permitAll()
                 .antMatchers(UserController.BASE_URL + "/**").permitAll()
                 .antMatchers(ActivityController.BASE_URL + "/**").permitAll()
+                .antMatchers(PureArticleController.BASE_URL + "/**").permitAll()
                 .anyRequest().authenticated()
                 .and().formLogin()
                 .and().httpBasic();

@@ -3,7 +3,6 @@ package com.emrecalik.swe573.server.exception;
 import com.emrecalik.swe573.server.model.response.ApiResponseDto;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -74,13 +73,13 @@ public class ExceptionHandlerAdvice {
         return ResponseEntity.badRequest().body(apiResponseDto);
     }
 
-    @ExceptionHandler(value = {Exception.class})
-    public ResponseEntity<ApiResponseDto> handleException(Exception ex) {
-        log.error("Exception: " + ex.getMessage());
-        ApiResponseDto apiResponseDto = ApiResponseDto.builder()
-                .header("Error")
-                .message("Internal Server Error")
-                .build();
-        return new ResponseEntity<>(apiResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @ExceptionHandler(value = {Exception.class})
+//    public ResponseEntity<ApiResponseDto> handleException(Exception ex) {
+//        log.error("Exception: " + ex.getMessage());
+//        ApiResponseDto apiResponseDto = ApiResponseDto.builder()
+//                .header("Error")
+//                .message("Internal Server Error")
+//                .build();
+//        return new ResponseEntity<>(apiResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 }

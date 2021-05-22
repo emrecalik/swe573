@@ -38,7 +38,8 @@ public class ArticleController {
     }
 
     @GetMapping(value = "/mylist", params = {"userId", "pageNum"})
-    public ResponseEntity<Map<String, Object>> getArticlesByUserId(@RequestParam Long userId, int pageNum) {
+    public ResponseEntity<Map<String, Object>> getArticlesByUserId(@RequestParam Long userId,
+                                                                   int pageNum) {
         return ResponseEntity.ok(articleService.getArticlesByUserId(userId, pageNum));
     }
 

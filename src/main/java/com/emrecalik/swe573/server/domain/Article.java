@@ -48,6 +48,7 @@ public class Article {
     @Column(name = "entity_id")
     private Long entityId;
 
+    @Lob
     private String title;
 
     @Lob

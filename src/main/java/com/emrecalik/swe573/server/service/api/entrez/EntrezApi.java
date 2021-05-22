@@ -9,7 +9,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -22,6 +21,7 @@ public class EntrezApi {
     private String API_EFETCH_PATH = "/efetch.fcgi";
     private String API_VERSION = "2.0";
     private String API_KEY = "4b48bebc2298f58802f12948c049d873d908";
+    private int API_RETMAX = 45000;
 
     private WebClient webClient;
 
@@ -29,28 +29,27 @@ public class EntrezApi {
         this.webClient = webClient;
     }
 
-    private String getArticleIds(String query) {
-        Set<String> idList = Objects.requireNonNull(webClient.get()
+    public List<String> getArticleIds(String query) {
+        List<String> idList = Objects.requireNonNull(webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(API_ESEARCH_PATH)
                         .queryParam("db", API_DB)
                         .queryParam("term", query)
                         .queryParam("api_key", API_KEY)
+                        .queryParam("retMax", API_RETMAX)
                         .build())
                 .accept(MediaType.APPLICATION_XML)
                 .retrieve()
                 .bodyToMono(ArticleIdList.class)
                 .block()).getIdList();
 
-        if (idList == null || idList.size() == 0) {
+        if (idList == null || idList.isEmpty()) {
             throw new ResourceNotFoundException("Not found article for keyword = " + query);
         }
-
-        return String.join(",", idList);
+        return idList;
     }
 
-    public Set<PubmedArticle> getPubmedArticleSet(String query) {
-        String idQuery = getArticleIds(query);
+    public Set<PubmedArticle> getPubmedArticlesByIds(String idQuery) {
         URI uri = UriComponentsBuilder
                 .fromPath(API_EFETCH_PATH)
                 .queryParam("db", API_DB)
@@ -68,9 +67,14 @@ public class EntrezApi {
                     .retrieve()
                     .bodyToMono(PubmedArticleSet.class)
                     .block()).getPubmedArticleSet();
-        } catch (Exception ex) {
-            throw new ExternalApiException("Entrez API does not respond!");
+        } catch (Exception ignored) {
+            return getPubmedArticlesByIds(idQuery);
         }
+    }
+
+    public Set<PubmedArticle> getPubmedArticleSet(String query) {
+        String idQuery = String.join(",", getArticleIds(query));
+        return getPubmedArticlesByIds(idQuery);
     }
 
     public PubmedArticle getPubmedArticleById(String id) {

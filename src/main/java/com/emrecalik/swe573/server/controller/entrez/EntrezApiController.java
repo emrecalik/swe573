@@ -1,6 +1,6 @@
-package com.emrecalik.swe573.server.controller;
+package com.emrecalik.swe573.server.controller.entrez;
 
-import com.emrecalik.swe573.server.model.response.EntrezApiResponseDto;
+import com.emrecalik.swe573.server.model.response.entrez.EntrezApiResponseDto;
 import com.emrecalik.swe573.server.service.EntrezApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

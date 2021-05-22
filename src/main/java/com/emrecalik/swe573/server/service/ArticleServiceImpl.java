@@ -8,7 +8,7 @@ import com.emrecalik.swe573.server.exception.ResourceNotFoundException;
 import com.emrecalik.swe573.server.model.request.ArticlePostRequestDto;
 import com.emrecalik.swe573.server.model.response.ApiResponseDto;
 import com.emrecalik.swe573.server.model.response.ArticleResponseDto;
-import com.emrecalik.swe573.server.model.response.EntrezApiResponseDto;
+import com.emrecalik.swe573.server.model.response.PureArticleResponseDto;
 import com.emrecalik.swe573.server.model.response.WikiApiResponseDto;
 import com.emrecalik.swe573.server.repository.ArticleRepository;
 import com.emrecalik.swe573.server.service.mapper.ArticleMapper;
@@ -74,8 +74,8 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         Set<Article> articleSet = new HashSet<>();
-        for (EntrezApiResponseDto entrezApiResponseDto : articlePostRequestDto.getArticles()) {
-            articleSet.add(ArticleMapper.convertArticleApiDtoToArticle(entrezApiResponseDto));
+        for (PureArticleResponseDto pureArticleResponseDto : articlePostRequestDto.getPureArticles()) {
+            articleSet.add(ArticleMapper.convertPureArticleResponseDtoToArticle(pureArticleResponseDto));
         }
 
         Long userId = articlePostRequestDto.getUserId();

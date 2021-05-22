@@ -1,6 +1,6 @@
 package com.emrecalik.swe573.server.model.request;
 
-import com.emrecalik.swe573.server.model.response.EntrezApiResponseDto;
+import com.emrecalik.swe573.server.model.response.PureArticleResponseDto;
 import com.emrecalik.swe573.server.model.response.WikiApiResponseDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +19,7 @@ public class ArticlePostRequestDto {
     private Long userId;
 
     @NotNull(message = "No article is selected!")
-    private Set<EntrezApiResponseDto> articles;
+    private Set<PureArticleResponseDto> pureArticles;
 
     @NotNull(message = "No wiki item is selected!")
     private Set<WikiApiResponseDto> wikiItems;
