@@ -1,26 +1,26 @@
-version: '3'
+version: '3.7'
 
 services:
 
   wikimed-backend:
-    image: emrecalik/swe-573
+    image: emrecalik/wikimed-server
     restart: always
     networks:
       - wikimed-network
     ports:
       - 8080:8080
     depends_on:
-      - course-registration-mysql
+      - wikimed-mysql
 
   wikimed-mysql:
-    image: mysql:8
+    image: emrecalik/wikimed-db
     networks:
-      - course-registration-network
+      - wikimed-network
     ports:
       - 3306:3306
     environment:
       - MYSQL_ROOT_PASSWORD=emre1905
-      - MYSQL_DATABASE=registrationdb
+      - MYSQL_DATABASE=wikimed_db
 
 networks:
   wikimed-network:
