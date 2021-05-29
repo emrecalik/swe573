@@ -63,11 +63,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetailsResponseDto getUserDetails(Long userId, Long requesterId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(UserServiceImpl.NOT_FOUND_USER_FOR_ID + userId));
+        User user = getUserById(userId);
 
         boolean isFollowedByRequester = user.getFollowers().stream()
-                .anyMatch(followee -> followee.getId().equals(requesterId));
+                .anyMatch(follower -> follower.getId().equals(requesterId));
 
         return UserMapper.convertUserToUserDetailsResponseDto(user, isFollowedByRequester);
     }

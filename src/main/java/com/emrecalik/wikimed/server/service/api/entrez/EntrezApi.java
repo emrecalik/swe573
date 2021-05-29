@@ -50,10 +50,11 @@ public class EntrezApi {
     }
 
     public Set<PubmedArticle> getPubmedArticlesByIds(String idQuery) {
+        String idQueryy = "34030176";
         URI uri = UriComponentsBuilder
                 .fromPath(API_EFETCH_PATH)
                 .queryParam("db", API_DB)
-                .queryParam("id", idQuery)
+                .queryParam("id", idQueryy)
                 .queryParam("rettype", "xml")
                 .queryParam("version", API_VERSION)
                 .queryParam("api_key", API_KEY)

@@ -28,6 +28,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthServiceImpl implements AuthService {
 
+    public static final String SUCCESS = "Success";
+
+    public static final String USER_IS_SUCCESSFULLY_REGISTERED = "User is successfully registered.";
+
+    public static final String DELETED_REFRESH_TOKEN = "Deleted Refresh Token: ";
+
+    public static final String REFRESH_TOKEN_DOES_NOT_EXIST = "Refresh Token does not exits!";
+
     private final UserService userService;
 
     private final AuthenticationManager authenticationManager;
@@ -100,15 +108,15 @@ public class AuthServiceImpl implements AuthService {
         userToSave.setRole(userRole);
         userService.save(userToSave);
         return ApiResponseDto.builder()
-                .header("Success")
-                .message("User is successfully registered.")
+                .header(AuthServiceImpl.SUCCESS)
+                .message(AuthServiceImpl.USER_IS_SUCCESSFULLY_REGISTERED)
                 .build();
     }
 
     @Override
     public RefreshedAccessTokenResponseDto refreshAccessToken(RefreshTokenRequestDto refreshTokenRequestDto) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenRequestDto.getRefreshToken())
-                .orElseThrow(() -> new ResourceNotFoundException("Refresh Token does not exits!"));
+                .orElseThrow(() -> new ResourceNotFoundException(AuthServiceImpl.REFRESH_TOKEN_DOES_NOT_EXIST));
 
         String refreshedAccessToken = jwtUtility.doGenerateToken(refreshToken.getUser().getUserName());
 
@@ -119,8 +127,7 @@ public class AuthServiceImpl implements AuthService {
 
     private String createRefreshToken(User user) {
         String refreshTokenCreated = RandomStringUtils.randomAlphanumeric(128);
-        boolean doesExist = refreshTokenRepository.existsByUserId(user.getId());
-        if (doesExist) {
+        if (refreshTokenRepository.existsByUserId(user.getId())) {
             RefreshToken refreshToken = refreshTokenRepository.findByUserId(user.getId());
             refreshToken.setToken(refreshTokenCreated);
             refreshTokenRepository.save(refreshToken);
@@ -137,6 +144,6 @@ public class AuthServiceImpl implements AuthService {
     public void signOut(RefreshTokenRequestDto refreshTokenRequestDto) {
         refreshTokenRepository.findByToken(refreshTokenRequestDto.getRefreshToken())
                 .ifPresent(refreshTokenRepository::delete);
-        log.info("Deleted Refresh Token: " + refreshTokenRequestDto.getRefreshToken());
+        log.info(AuthServiceImpl.DELETED_REFRESH_TOKEN + refreshTokenRequestDto.getRefreshToken());
     }
 }

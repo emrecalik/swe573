@@ -49,8 +49,8 @@ public class ArticleController {
     }
 
     @GetMapping(value = "/{id}", params = {"userId"})
-    public ResponseEntity<ArticleResponseDto> getArticleById(@PathVariable Long id,
-                                                             @RequestParam Long userId) {
+    public ResponseEntity<ArticleResponseDto> getUserArticleById(@PathVariable Long id,
+                                                                 @RequestParam Long userId) {
         return ResponseEntity.ok(articleService.getUserArticleById(id, userId));
     }
 

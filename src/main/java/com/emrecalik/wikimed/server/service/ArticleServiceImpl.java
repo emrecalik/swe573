@@ -30,13 +30,13 @@ import java.util.stream.Collectors;
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
-    private static final String SUCCESS = "Success";
+    public static final String SUCCESS = "Success";
 
-    private static final String ARTICLE_SUCCESSFULLY_TAGGED = "Article(s) is(are) successfully tagged.";
+    public static final String ARTICLE_SUCCESSFULLY_TAGGED = "Article(s) is(are) successfully tagged.";
 
-    private static final String ARTICLE_SUCCESSFULLY_DELETED = "Article is successfully deleted.";
+    public static final String ARTICLE_SUCCESSFULLY_DELETED = "Article is successfully deleted.";
 
-    private static final String ARTICLE_TAG_SUCCESSFULLY_DELETED = "Article Tag is successfully deleted.";
+    public static final String ARTICLE_TAG_SUCCESSFULLY_DELETED = "Article Tag is successfully deleted.";
 
     private static final String ARTICLE_COULD_NOT_BE_FOUND = "Article could not be found!";
 
