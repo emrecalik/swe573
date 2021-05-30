@@ -54,8 +54,8 @@ jobs:
         with:
           java-version: 11.0.4
 
-      - name: Build
-          run: mvn -B package --file pom.xml
+      - name: Maven Package
+        run: mvn -B clean package -DskipTests
 
       - name: Deploy To AWS EBS
         uses: einaregilsson/beanstalk-deploy@v16
