@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping(ActivityController.BASE_URL)
 public class ActivityController {
 
-    public final static String BASE_URL = "/api/activity";
+    public final static String BASE_URL = "/api/activities";
 
     private final ActivityService activityService;
 

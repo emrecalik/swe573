@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @RequestMapping(EntrezApiDbController.BASE_URL)
 public class EntrezApiDbController {
 
-    public static final String BASE_URL = "/api/entrez/article";
+    public static final String BASE_URL = "/api/entrez/articles";
 
     private final EntrezApiService entrezApiService;
 

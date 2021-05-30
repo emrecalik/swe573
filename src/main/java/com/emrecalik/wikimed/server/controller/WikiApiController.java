@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping(WikiApiController.BASE_URL)
 public class WikiApiController {
 
-    public static final String BASE_URL = "/api/wiki";
+    public static final String BASE_URL = "/api/wikiItems";
 
     private final WikiApiService wikiApiService;
 

@@ -23,7 +23,7 @@ import java.util.Map;
 @RequestMapping(ArticleController.BASE_URL)
 public class ArticleController {
 
-    public static final String BASE_URL = "/api/article";
+    public static final String BASE_URL = "/api/articles";
 
     private final ArticleService articleService;
 

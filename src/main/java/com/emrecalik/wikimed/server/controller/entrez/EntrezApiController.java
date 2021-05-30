@@ -17,7 +17,7 @@ import java.util.Set;
 @RequestMapping(EntrezApiController.BASE_URL)
 public class EntrezApiController {
 
-    public static final String BASE_URL = "/api/entrez/article";
+    public static final String BASE_URL = "/api/entrez/articles";
 
     private final EntrezApiService entrezApiService;
 
