@@ -1,0 +1,42 @@
+name: CICD Branch
+
+on:
+  push:
+    branches:
+      - 'CICD'
+
+jobs:
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Setup JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11.0.4
+
+      - name: Maven Package
+        run: mvn -B clean package -DskipTests
+      - name: Maven Verify
+        run: mvn -B clean verify
+
+  docker:
+    name: Publish On Docker Hub
+    runs-on: ubuntu-18.04
+    needs: [test]
+    env:
+      REPO: ${{secrets.DOCKER_REPO}}
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Login To Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASS }}
+
+      - name: Build Docker Image
+        run: docker build -t $REPO:latest -t $REPO:${GITHUB_SHA::8} .
+
+      - name: Publish Docker Image
+        run: docker push $REPO
