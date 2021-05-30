@@ -61,7 +61,7 @@ jobs:
         run: zip -r deploy.zip *
 
       - name: Deploy To AWS EBS
-        uses: einaregilsson/beanstalk-deploy@v13
+        uses: einaregilsson/beanstalk-deploy@v16
         with:
           aws_access_key: ${{secrets.AWS_ACCESS_KEY_ID}}
           aws_secret_key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
