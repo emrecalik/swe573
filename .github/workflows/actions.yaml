@@ -10,7 +10,6 @@ jobs:
   test:
     name: Unit Tests
     runs-on: ubuntu-18.04
-
     steps:
       - uses: actions/checkout@v1
 
@@ -32,9 +31,34 @@ jobs:
       REPO: ${{secrets.DOCKER_REPO}}
     steps:
       - uses: actions/checkout@v1
+
       - name: Login To Docker Hub
         run: docker login -u ${{secrets.DOCKER_USER}} -p ${{secrets.DOCKER_PASS}}
+
       - name: Build Docker Image
         run: docker build -t $REPO:latest -t $REPO:${GITHUB_SHA::8} .
+
       - name: Publish Docker Image
         run: docker push $REPO
+
+  deploy:
+    name: Deploy To AWS EBS
+    runs-on: ubuntu-18.04
+    needs: [test]
+    steps:
+      - name: Checkout Source Code
+        uses: action/checkout@v1
+
+      - name: Generate Deployment Package
+        uses: zip -r wikimed-server-deploy.zip . -x '*.git*'
+
+      - name: Deploy To AWS EBS
+        uses: einaregilsson/beanstalk-deploy@v16
+        with:
+          aws_access_key: ${{secrets.AWS_ACCESS_KEY_ID}}
+          aws_secret_key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          application_name: wikimed-server
+          environment_name: Wikimedserver-env
+          version_label: "wikimed-server-${{ steps.format-time.outputs.replaced }}"
+          region:
+          deployment_package: wikimed-server-deploy.zip
