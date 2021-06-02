@@ -3,6 +3,7 @@ package com.emrecalik.wikimed.server.service.api.entrez;
 import com.emrecalik.wikimed.server.exception.ExternalApiException;
 import com.emrecalik.wikimed.server.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,12 +17,31 @@ import java.util.Set;
 @Slf4j
 @Component
 public class EntrezApi {
-    private String API_DB = "pubmed";
-    private String API_ESEARCH_PATH = "/esearch.fcgi";
-    private String API_EFETCH_PATH = "/efetch.fcgi";
-    private String API_VERSION = "2.0";
-    private String API_KEY = "4b48bebc2298f58802f12948c049d873d908";
-    private int API_RETMAX = 45000;
+
+    private static final String NOT_FOUND_ARTICLE_FOR_KEYWORD = "Not found article for keyword = ";
+
+    private static final String ENTREZ_API_DOES_NOT_RESPOND = "Entrez API does not respond!";
+
+    @Value("${entrez.api.db}")
+    private String apiDb;
+
+    @Value("${entrez.api.esearch.path}")
+    private String apiEsearchPath;
+
+    @Value("${entrez.api.efetch.path}")
+    private String apiEfetchPath;
+
+    @Value("${entrez.api.version}")
+    private String apiVersion;
+
+    @Value("${entrez.api.key}")
+    private String apiKey;
+
+    @Value("${entrez.api.retmax}")
+    private int apiRetmax;
+
+    @Value("${entrez.api.rettype}")
+    private int apiRettype;
 
     private WebClient webClient;
 
@@ -32,11 +52,11 @@ public class EntrezApi {
     public List<String> getArticleIds(String query) {
         List<String> idList = Objects.requireNonNull(webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(API_ESEARCH_PATH)
-                        .queryParam("db", API_DB)
+                        .path(apiEsearchPath)
+                        .queryParam("db", apiDb)
                         .queryParam("term", query)
-                        .queryParam("api_key", API_KEY)
-                        .queryParam("retMax", API_RETMAX)
+                        .queryParam("api_key", apiKey)
+                        .queryParam("retMax", apiRetmax)
                         .build())
                 .accept(MediaType.APPLICATION_XML)
                 .retrieve()
@@ -44,20 +64,19 @@ public class EntrezApi {
                 .block()).getIdList();
 
         if (idList == null || idList.isEmpty()) {
-            throw new ResourceNotFoundException("Not found article for keyword = " + query);
+            throw new ResourceNotFoundException(EntrezApi.NOT_FOUND_ARTICLE_FOR_KEYWORD + query);
         }
         return idList;
     }
 
     public Set<PubmedArticle> getPubmedArticlesByIds(String idQuery) {
-        String idQueryy = "34030176";
         URI uri = UriComponentsBuilder
-                .fromPath(API_EFETCH_PATH)
-                .queryParam("db", API_DB)
-                .queryParam("id", idQueryy)
-                .queryParam("rettype", "xml")
-                .queryParam("version", API_VERSION)
-                .queryParam("api_key", API_KEY)
+                .fromPath(apiEfetchPath)
+                .queryParam("db", apiDb)
+                .queryParam("id", idQuery)
+                .queryParam("rettype", apiRettype)
+                .queryParam("version", apiVersion)
+                .queryParam("api_key", apiKey)
                 .build().toUri();
 
         log.info("PubMed URI => " + uri.toString());
@@ -81,7 +100,7 @@ public class EntrezApi {
     public PubmedArticle getPubmedArticleById(String id) {
         Set<PubmedArticle> pubmedArticleSet = getPubmedArticleSet(id);
         if (pubmedArticleSet == null) {
-            throw new ExternalApiException("Entrez API does not respond!");
+            throw new ExternalApiException(EntrezApi.ENTREZ_API_DOES_NOT_RESPOND);
         }
         return pubmedArticleSet.iterator().next();
     }

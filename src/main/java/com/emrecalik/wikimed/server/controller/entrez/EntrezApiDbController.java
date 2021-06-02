@@ -28,10 +28,9 @@ public class EntrezApiDbController {
         this.pureArticleService = pureArticleService;
     }
 
-    @PostMapping("/db")
+    @PostMapping("/db/populate")
     public void getArticleIdList() throws InterruptedException {
         String QUERY = "influenza";
-
         List<String> articleIdList = entrezApiService.getArticleIdList(QUERY);
         List<List<String>> idSubLists = Lists.partition(articleIdList, 80);
         for (List<String> idSubList : idSubLists) {

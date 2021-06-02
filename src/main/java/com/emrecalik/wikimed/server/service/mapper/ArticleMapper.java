@@ -15,6 +15,8 @@ import com.emrecalik.wikimed.server.model.response.PureArticleAuthorResponseDto;
 import com.emrecalik.wikimed.server.model.response.PureArticleResponseDto;
 import com.emrecalik.wikimed.server.model.response.entrez.EntrezApiResponseDto;
 import com.emrecalik.wikimed.server.service.api.entrez.PubmedArticle;
+import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
+import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,21 +31,23 @@ public class ArticleMapper {
 
     public static EntrezApiResponseDto convertPubmedArticleToPubmedArticleDto(PubmedArticle pubmedArticle) {
 
-        String articleAbstract = pubmedArticle.getMedlineCitation().getArticle().getAbstractText() == null ?
-                null : String.join(" ", pubmedArticle.getMedlineCitation().getArticle().getAbstractText());
+//        String articleAbstract = pubmedArticle.getMedlineCitation().getArticle().getAbstractText() == null ?
+//                null : String.join(" ", pubmedArticle.getMedlineCitation().getArticle().getAbstractText());
+
+        String articleAbstract = null;
 
         List<PubmedArticle.MedlineCitation.Article.Author> fetchedAuthorList = pubmedArticle
                 .getMedlineCitation().getArticle().getAuthorList();
 
         List<ArticleAuthorResponseDto> authors = fetchedAuthorList == null ?
                 null : fetchedAuthorList.stream().map(author -> ArticleAuthorResponseDto.builder()
-                        .lastName(author.getLastName())
-                        .foreName(author.getForeName())
-                        .build()).collect(Collectors.toList());
+                .lastName(author.getLastName())
+                .foreName(author.getForeName())
+                .build()).collect(Collectors.toList());
 
         return EntrezApiResponseDto.builder()
                 .entityId(Long.parseLong(pubmedArticle.getMedlineCitation().getId()))
-                .title(pubmedArticle.getMedlineCitation().getArticle().getArticleTitle())
+//                .title(pubmedArticle.getMedlineCitation().getArticle().getArticleTitle())
                 .articleAbstract(articleAbstract)
                 .authors(authors)
                 .keywords(pubmedArticle.getMedlineCitation().getKeywordList())
@@ -136,8 +140,21 @@ public class ArticleMapper {
     }
 
     public static PureArticle convertPubmedArticleToPureArticle(PubmedArticle pubmedArticle) {
-        String articleAbstract = pubmedArticle.getMedlineCitation().getArticle().getAbstractText() == null ?
-                null : String.join(" ", pubmedArticle.getMedlineCitation().getArticle().getAbstractText());
+        PubmedArticle.MedlineCitation.Article.Abstract pubmedArticleAbstract
+                = pubmedArticle.getMedlineCitation().getArticle().getAbstractText();
+        String articleAbstract = null;
+        if (pubmedArticleAbstract != null && pubmedArticleAbstract.getMixedContent() != null) {
+            List<Object> abstractMixedContentList = pubmedArticleAbstract.getMixedContent();
+            articleAbstract = getAbstractText(abstractMixedContentList);
+        }
+
+        PubmedArticle.MedlineCitation.Article.ArticleTitle pubmedArticleTitle
+                = pubmedArticle.getMedlineCitation().getArticle().getArticleTitle();
+        String articleTitle = null;
+        if (pubmedArticleTitle != null && pubmedArticleTitle.getMixedContent() != null) {
+            List<Object> titleMixedContentList = pubmedArticleTitle.getMixedContent();
+            articleTitle = getTitleText(titleMixedContentList);
+        }
 
         List<PubmedArticle.MedlineCitation.Article.Author> fetchedAuthorList = pubmedArticle
                 .getMedlineCitation().getArticle().getAuthorList();
@@ -153,9 +170,54 @@ public class ArticleMapper {
         return PureArticle.builder()
                 .entityId(Long.parseLong(pubmedArticle.getMedlineCitation().getId()))
                 .articleAbstract(articleAbstract)
-                .title(pubmedArticle.getMedlineCitation().getArticle().getArticleTitle())
+                .title(articleTitle)
                 .authors(authors)
                 .keywords(keywords == null ? null : new HashSet<>(keywords))
                 .build();
     }
+
+
+    private static String getAbstractText(List<Object> mixedContentList) {
+        StringBuilder text = new StringBuilder("");
+        for (Object mixedContent : mixedContentList) {
+            try {
+                ElementNSImpl content = (ElementNSImpl) mixedContent;
+                if (content.getLocalName() == null
+                        || content.getLocalName().equals("CopyrightInformation")) {
+                    break;
+                }
+                Node node = content.getFirstChild();
+                while (node.getNextSibling() != null) {
+                    text.append(node.getTextContent());
+                    node = node.getNextSibling();
+                }
+                text.append(node.getTextContent());
+            } catch (Exception ignored) {
+            }
+        }
+        return text.toString();
+    }
+
+    private static String getTitleText(List<Object> mixedContentList) {
+        StringBuilder text = new StringBuilder("");
+        for (Object mixedContent : mixedContentList) {
+            if (mixedContent instanceof String) {
+                text.append(mixedContent);
+            } else {
+                ElementNSImpl content = (ElementNSImpl) mixedContent;
+                if (content.getLocalName() == null) {
+                    break;
+                }
+                Node node = content.getFirstChild();
+                while (node.getNextSibling() != null) {
+                    text.append(node.getTextContent());
+                    node = node.getNextSibling();
+                }
+                text.append(node.getTextContent());
+            }
+        }
+
+        return text.toString();
+    }
 }
+

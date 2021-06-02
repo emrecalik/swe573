@@ -13,12 +13,14 @@ import java.util.List;
 @Component
 public class WikidataApi {
 
+    private static final String WIKIDATA_API_DOES_NOT_RESPOND = "Wikidata API does not respond!";
+
     public List<WbSearchEntitiesResult> getWikidataItems(String query) {
         WikibaseDataFetcher wikidataDataFetcher = WikibaseDataFetcher.getWikidataDataFetcher();
         try {
             return wikidataDataFetcher.searchEntities(query);
         } catch (MediaWikiApiErrorException | IOException wikiApiErrorException) {
-            throw new ExternalApiException("Wikidata API does not respond!");
+            throw new ExternalApiException(WikidataApi.WIKIDATA_API_DOES_NOT_RESPOND);
         }
     }
 
@@ -27,7 +29,7 @@ public class WikidataApi {
         try {
             return wikibaseDataFetcher.getEntityDocument(id);
         } catch (MediaWikiApiErrorException | IOException wikiApiErrorException) {
-            throw new ExternalApiException("Wikidata API does not respond!");
+            throw new ExternalApiException(WikidataApi.WIKIDATA_API_DOES_NOT_RESPOND);
         }
     }
 }

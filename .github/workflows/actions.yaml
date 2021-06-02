@@ -3,7 +3,7 @@ name: CICD Branch
 on:
   push:
     branches:
-      - 'CICD'
+      - 'main'
 
 jobs:
 
@@ -40,3 +40,23 @@ jobs:
 
       - name: Publish Docker Image
         run: docker push $REPO
+
+#  deploy:
+#    name: Deploy
+#    runs-on: ubuntu-18.04
+#    steps:
+#        uses: actions/checkout@v1
+#
+#      - name: Generate Deployment Package
+#        run: zip -j wikimed-server-0.0.1-SNAPSHOT.jar.zip wikimed-server-0.0.1-SNAPSHOT.jar
+#
+#      - name: Deploy To EB
+#        uses: einaregilsson/beanstalk-deploy@v16
+#        with:
+#          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          application_name: wikimed-server-app
+#          environment_name: Wikimedserverapp-env
+#          version_label: ${{ steps.vars.outputs.sha_short }}
+#          region: eu-south-1
+#          deployment_package: wikimed-server-0.0.1-SNAPSHOT.jar.zip

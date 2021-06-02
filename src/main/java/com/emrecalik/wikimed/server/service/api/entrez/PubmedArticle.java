@@ -2,8 +2,10 @@ package com.emrecalik.wikimed.server.service.api.entrez;
 
 import lombok.Getter;
 
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlMixed;
 import java.util.List;
 
 public class PubmedArticle {
@@ -28,11 +30,24 @@ public class PubmedArticle {
         public static class Article {
 
             @XmlElement(name = "ArticleTitle")
-            private String articleTitle;
+            private ArticleTitle articleTitle;
 
-            @XmlElementWrapper(name = "Abstract")
-            @XmlElement(name = "AbstractText")
-            private List<String> abstractText;
+            @Getter
+            public static class ArticleTitle {
+                @XmlAnyElement(lax = true)
+                @XmlMixed
+                private List<Object> mixedContent;
+            }
+
+            @XmlElement(name = "Abstract")
+            private Abstract abstractText;
+
+            @Getter
+            public static class Abstract {
+                @XmlAnyElement(lax = true)
+                @XmlMixed
+                private List<Object> mixedContent;
+            }
 
             @XmlElementWrapper(name = "AuthorList")
             @XmlElement(name = "Author")
