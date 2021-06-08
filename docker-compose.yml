@@ -22,7 +22,12 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=emre1905
       - MYSQL_DATABASE=wikimed_db
+    volumes:
+      - vikimed-volume:/var/lib/mysql
     mem_limit: 700M
 
 networks:
   wikimed-network:
+
+volumes:
+  wikimed-volume:

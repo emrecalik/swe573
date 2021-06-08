@@ -41,7 +41,7 @@ public class EntrezApi {
     private int apiRetmax;
 
     @Value("${entrez.api.rettype}")
-    private int apiRettype;
+    private String apiRettype;
 
     private WebClient webClient;
 
