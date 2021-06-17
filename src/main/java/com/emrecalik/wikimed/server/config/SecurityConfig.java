@@ -58,7 +58,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(ActivityController.BASE_URL + "/**").permitAll()
                 .antMatchers(PureArticleController.BASE_URL + "/**").permitAll()
                 .antMatchers("/v2/api-docs",
-                        "/configuration/ui",
                         "/swagger-resources/**",
                         "/configuration/security",
                         "/swagger-ui.html",
