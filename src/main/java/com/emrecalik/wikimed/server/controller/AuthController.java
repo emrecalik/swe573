@@ -8,6 +8,7 @@ import com.emrecalik.wikimed.server.model.response.RefreshedAccessTokenResponseD
 import com.emrecalik.wikimed.server.model.response.SignInResponseDto;
 import com.emrecalik.wikimed.server.service.AuthService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,21 +36,25 @@ public class AuthController {
     }
 
     @PostMapping(SIGN_UP_URL)
+    @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<ApiResponseDto> signUp(@RequestBody SignUpRequestDto signUpRequestDto) {
         return ResponseEntity.ok(authService.signUp(signUpRequestDto));
     }
 
     @PostMapping(SIGN_IN_URL)
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<SignInResponseDto> signIn(@RequestBody SignInRequestDto signInRequestDto) {
         return ResponseEntity.ok(authService.signIn(signInRequestDto));
     }
 
     @PostMapping(TOKEN_REFRESH_URL)
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<RefreshedAccessTokenResponseDto> refreshToken(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
         return ResponseEntity.ok(authService.refreshAccessToken(refreshTokenRequestDto));
     }
 
     @DeleteMapping(SIGN_OUT_URL)
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public void signOut(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto) {
         authService.signOut(refreshTokenRequestDto);
     }

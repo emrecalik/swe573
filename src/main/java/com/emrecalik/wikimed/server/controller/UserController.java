@@ -4,6 +4,7 @@ import com.emrecalik.wikimed.server.model.response.UserDetailsResponseDto;
 import com.emrecalik.wikimed.server.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,18 +27,21 @@ public class UserController {
     }
 
     @GetMapping(value = "/{userId}", params = {"requesterId"})
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<UserDetailsResponseDto> getUserDetails(@PathVariable Long userId,
                                                                  @RequestParam Long requesterId) {
         return ResponseEntity.ok(userService.getUserDetails(userId, requesterId));
     }
 
     @PostMapping("/{userId}/follow/{followeeId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<UserDetailsResponseDto> followUser(@PathVariable Long userId,
                                                              @PathVariable Long followeeId) {
         return ResponseEntity.ok(userService.followUser(userId, followeeId));
     }
 
     @DeleteMapping("/{userId}/unFollow/{followeeId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<UserDetailsResponseDto> unFollowUser(@PathVariable Long userId,
                                                                @PathVariable Long followeeId) {
         return ResponseEntity.ok(userService.unFollowUser(userId, followeeId));

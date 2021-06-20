@@ -46,7 +46,6 @@ jobs:
 #    runs-on: ubuntu-18.04
 #    steps:
 #        uses: actions/checkout@v1
-#
 #      - name: Generate Deployment Package
 #        run: zip -j wikimed-server-0.0.1-SNAPSHOT.jar.zip wikimed-server-0.0.1-SNAPSHOT.jar
 #

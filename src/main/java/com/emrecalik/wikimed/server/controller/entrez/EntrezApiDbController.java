@@ -4,6 +4,7 @@ import com.emrecalik.wikimed.server.domain.purearticle.PureArticle;
 import com.emrecalik.wikimed.server.service.EntrezApiService;
 import com.emrecalik.wikimed.server.service.PureArticleService;
 import com.google.common.collect.Lists;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,7 @@ public class EntrezApiDbController {
     }
 
     @PostMapping("/db/populate")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public void getArticleIdList() throws InterruptedException {
         String QUERY = "influenza";
         List<String> articleIdList = entrezApiService.getArticleIdList(QUERY);

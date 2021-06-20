@@ -1,12 +1,8 @@
 package com.emrecalik.wikimed.server.config;
 
-import com.emrecalik.wikimed.server.controller.ActivityController;
-import com.emrecalik.wikimed.server.controller.ArticleController;
 import com.emrecalik.wikimed.server.controller.AuthController;
 import com.emrecalik.wikimed.server.controller.PureArticleController;
-import com.emrecalik.wikimed.server.controller.UserController;
 import com.emrecalik.wikimed.server.controller.WikiApiController;
-import com.emrecalik.wikimed.server.controller.entrez.EntrezApiController;
 import com.emrecalik.wikimed.server.security.CustomUserDetailsService;
 import com.emrecalik.wikimed.server.security.JwtAuthFilter;
 import com.emrecalik.wikimed.server.security.JwtAuthenticationEntryPoint;
@@ -51,11 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authorizeRequests()
                 .antMatchers(AuthController.BASE_URL + "/**").permitAll()
-                .antMatchers(EntrezApiController.BASE_URL + "/**").permitAll()
                 .antMatchers(WikiApiController.BASE_URL + "/**").permitAll()
-                .antMatchers(ArticleController.BASE_URL + "/**").permitAll()
-                .antMatchers(UserController.BASE_URL + "/**").permitAll()
-                .antMatchers(ActivityController.BASE_URL + "/**").permitAll()
                 .antMatchers(PureArticleController.BASE_URL + "/**").permitAll()
                 .antMatchers("/v2/api-docs",
                         "/swagger-resources/**",

@@ -4,6 +4,7 @@ import com.emrecalik.wikimed.server.model.response.ApiResponseDto;
 import com.emrecalik.wikimed.server.service.RateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ public class RateController {
     }
 
     @PostMapping(value = "/{id}/rate", params = {"userId", "rateValue"})
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<ApiResponseDto> rateArticle(@PathVariable Long id,
                                                       @RequestParam Long userId,
                                                       @RequestParam int rateValue) {
